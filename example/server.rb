@@ -9,15 +9,18 @@ server = SimpleHttpServer.new config
 # /mruby location config
 server.location "/mruby" do |req|
   if req.method == "POST"
-    "Hello mruby World. Your post is '#{req.body}'\n"
+    server.response_body = "Hello mruby World. Your post is '#{req.body}'\n"
   else
-    "Hello mruby World at '#{req.path}'\n"
+    server.response_body = "Hello mruby World at '#{req.path}'\n"
   end
+  server.create_response
 end
 
 # /mruby/ruby location config
 server.location "/mruby/ruby" do |req|
-  "Hello mruby World. longest matche.\n"
+  server.set_response_headers ["Server: mruby-simplehttpserver"]
+  server.response_body = "Hello mruby World. longest matche.\n"
+  server.create_response
 end
 
 server.run

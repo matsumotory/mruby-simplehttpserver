@@ -5,6 +5,7 @@ class TCPServer
 end
 
 class SimpleHttpServer
+  attr_accessor :response_body
   def initialize config
     @config = config
     @host = config[:server_ip]
@@ -14,6 +15,8 @@ class SimpleHttpServer
     
     @req = nil
     @res = nil
+    @response_headers = []
+    @response_body = nil
   end
 
   def run
@@ -28,6 +31,8 @@ class SimpleHttpServer
           break if buf.size != 1024
         end
         @req = HTTP::Parser.new.parse_request data
+        @response_headers = []
+        @response_body = nil
 
         # checking location config
         key = check_location(@req.path)
@@ -51,16 +56,26 @@ class SimpleHttpServer
     end
   end
 
+  def set_response_headers response_headers
+    @response_headers << response_headers
+  end
+
+  def create_response
+    set_response_headers ["Content-Length: #{@response_body.size}"]
+    "HTTP/1.0 200 OK\r\n#{@response_headers.join "\r\n"}\r\n\r\n#{@response_body}"
+  end
+
   def get_response socket, req
     body = "Hello mruby-simplehttpserver World.\n"
-    res = "HTTP/1.0 200 OK\r\nContent-Length: #{body.size}\r\n\r\n#{body}"
+    set_response_headers ["Content-Length: #{body.size}"]
+    res = "HTTP/1.0 200 OK\r\n#{@response_headers.join "\r\n"}\r\n\r\n#{body}"
     socket.send res, 0
   end
 
   def error_response socket
     body = "Service Unavailable\n"
-    headers = ["Content-Length: #{body.size}"]
-    err = "HTTP/1.0 503 Service Unavailable\r\n#{headers.join "\r\n"}\r\n\r\n"
+    set_response_headers ["Content-Length: #{body.size}"]
+    err = "HTTP/1.0 503 Service Unavailable\r\n#{@response_headers.join "\r\n"}\r\n\r\n"
     socket.send "#{err}#{body}", 0
   end
 
