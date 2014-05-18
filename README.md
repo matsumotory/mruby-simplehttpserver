@@ -1,5 +1,7 @@
 # mruby-simplehttpserver   [![Build Status](https://travis-ci.org/matsumoto-r/mruby-simplehttpserver.svg?branch=master)](https://travis-ci.org/matsumoto-r/mruby-simplehttpserver)
-SimpleHttpServer class
+
+mruby-simplehttpserver is a HTTP Server with less dependency for mruby. mruby-simplehttpserver depends on mruby-io, mruby-socket and mruby-http. A Web server using mruby-simplehttpserver run on a environment which is not very rich like [OSv](http://osv.io/) or simple Linux box.
+
 ## install by mrbgems 
 - add conf.gem line to `build_config.rb` 
 
