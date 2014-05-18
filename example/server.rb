@@ -1,10 +1,28 @@
-config = {
+# 
+# Server Configration
+# 
+
+server = SimpleHttpServer.new({
+
   :server_ip => "0.0.0.0",
   :port  =>  8000,
-  :document_root => "./",
-}
 
-server = SimpleHttpServer.new config
+  # not implemented 
+  :document_root => "./",
+})
+
+# 
+# Location Configration
+# 
+
+# You can use request parameters in location
+#   r.method
+#   r.schema
+#   r.host
+#   r.port
+#   r.path
+#   r.query
+#   r.body
 
 # /mruby location config
 server.location "/mruby" do |r|
@@ -16,7 +34,7 @@ server.location "/mruby" do |r|
   server.create_response
 end
 
-# /mruby/ruby location config
+# /mruby/ruby location config, location config longest match
 server.location "/mruby/ruby" do |r|
   server.set_response_headers ["Server: mruby-simplehttpserver"]
   server.response_body = "Hello mruby World. longest matche.\n"
@@ -24,11 +42,13 @@ server.location "/mruby/ruby" do |r|
 end
 
 server.location "/html" do |r|
+  server.set_response_headers ["Server: mruby-simplehttpserver"]
   server.set_response_headers ["Content-Type: text/html; charset=utf-8"]
-  server.response_body = "<H1>Hello mruby World. longest matche.</H1>"
+  server.response_body = "<H1>Hello mruby World.</H1>\n"
   server.create_response
 end
 
+# Custom error response message
 server.location "/notfound" do |r|
   server.set_response_headers ["Server: mruby-simplehttpserver"]
   server.response_body = "Not Found on this server: #{r.path}\n"
