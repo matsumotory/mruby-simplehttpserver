@@ -5,6 +5,7 @@ class TCPServer
 end
 
 class SimpleHttpServer
+  SEP = "\r\n"
   attr_accessor :response_body
   def initialize config
     @config = config
@@ -62,20 +63,18 @@ class SimpleHttpServer
 
   def create_response
     set_response_headers ["Content-Length: #{@response_body.size}"]
-    "HTTP/1.0 200 OK\r\n#{@response_headers.join "\r\n"}\r\n\r\n#{@response_body}"
+    "HTTP/1.0 200 OK" + SEP + @response_headers.join("\r\n") + SEP * 2 + @response_body
   end
 
   def get_response socket, req
-    body = "Hello mruby-simplehttpserver World.\n"
-    set_response_headers ["Content-Length: #{body.size}"]
-    res = "HTTP/1.0 200 OK\r\n#{@response_headers.join "\r\n"}\r\n\r\n#{body}"
-    socket.send res, 0
+    @response_body = "Hello mruby-simplehttpserver World.\n"
+    socket.send create_response, 0
   end
 
   def error_response socket
     body = "Service Unavailable\n"
     set_response_headers ["Content-Length: #{body.size}"]
-    err = "HTTP/1.0 503 Service Unavailable\r\n#{@response_headers.join "\r\n"}\r\n\r\n"
+    err = "HTTP/1.0 503 Service Unavailable" + SEP + @response_headers.join("\r\n") + SEP * 2
     socket.send "#{err}#{body}", 0
   end
 
