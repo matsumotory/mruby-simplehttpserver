@@ -4,4 +4,5 @@ MRuby::Gem::Specification.new('mruby-simplehttpserver') do |spec|
   spec.version = '0.0.1'
   spec.add_dependency('mruby-io')
   spec.add_dependency('mruby-socket')
+  spec.add_dependency('mruby-http')
 end
