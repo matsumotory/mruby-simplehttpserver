@@ -23,4 +23,11 @@ server.location "/mruby/ruby" do |req|
   server.create_response
 end
 
+# /notfound location config
+server.location "/notfound" do |req|
+  server.set_response_headers ["Server: mruby-simplehttpserver"]
+  server.response_body = "Not Found on this server: #{req.path}\n"
+  server.create_response "HTTP/1.0 404 Not Found"
+end
+
 server.run

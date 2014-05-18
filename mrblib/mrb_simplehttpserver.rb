@@ -42,10 +42,10 @@ class SimpleHttpServer
           response = @locconf[key].call @req
           conn.send response, 0
         else
+          # default response when can't found location config
           if @req.method == "GET"
             get_response conn, @req
           elsif @req.method == "POST"
-            #post_response conn, @req
             error_response conn
           else
             error_response conn
@@ -61,9 +61,12 @@ class SimpleHttpServer
     @response_headers << response_headers
   end
 
-  def create_response
+  def create_response status_msg=nil
+    if status_msg.nil?
+      status_msg = "HTTP/1.0 200 OK"
+    end
     set_response_headers ["Content-Length: #{@response_body.size}"]
-    "HTTP/1.0 200 OK" + SEP + @response_headers.join("\r\n") + SEP * 2 + @response_body
+    status_msg + SEP + @response_headers.join("\r\n") + SEP * 2 + @response_body
   end
 
   def get_response socket, req
