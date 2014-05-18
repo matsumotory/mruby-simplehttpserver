@@ -3,8 +3,7 @@
 mruby-simplehttpserver is a HTTP Server with less dependency for mruby. mruby-simplehttpserver depends on mruby-io, mruby-socket and mruby-http. A Web server using mruby-simplehttpserver run on a environment which is not very rich like [OSv](http://osv.io/) or simple Linux box.
 
 ## install by mrbgems 
-- add conf.gem line to `build_config.rb` 
-
+#### add conf.gem line to `build_config.rb` 
 ```ruby
 MRuby::Build.new do |conf|
 
@@ -16,12 +15,15 @@ MRuby::Build.new do |conf|
     conf.gem :github => 'matsumoto-r/mruby-simplehttpserver'
 end
 ```
-
+#### run mruby
+```bash
+./bin/mruby server.rb
+```
 ## License
 under the MIT License:
 - see LICENSE file
 
-## example 
+## example server.rb
 ```ruby
 # 
 # Server Configration
