@@ -55,6 +55,7 @@ end
 #   r.port
 #   r.path
 #   r.query
+#   r.headers
 #   r.body
 
 # /mruby location config
