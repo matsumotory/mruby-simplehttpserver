@@ -23,7 +23,12 @@ server.location "/mruby/ruby" do |r|
   server.create_response
 end
 
-# /notfound location config
+server.location "/html" do |r|
+  server.set_response_headers ["Content-Type: text/html; charset=utf-8"]
+  server.response_body = "<H1>Hello mruby World. longest matche.</H1>"
+  server.create_response
+end
+
 server.location "/notfound" do |r|
   server.set_response_headers ["Server: mruby-simplehttpserver"]
   server.response_body = "Not Found on this server: #{r.path}\n"
