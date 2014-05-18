@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="Simple HTTP Server for mruby : mruby-simplehttpserver is a HTTP Server with less dependency for mruby" />
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Simple HTTP Server for mruby</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/matsumoto-r/mruby-simplehttpserver">View on GitHub</a>
+
+          <h1 id="project_title">Simple HTTP Server for mruby</h1>
+          <h2 id="project_tagline">mruby-simplehttpserver is a HTTP Server with less dependency for mruby</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/matsumoto-r/mruby-simplehttpserver/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/matsumoto-r/mruby-simplehttpserver/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h1>
+<a name="mruby-simplehttpserver---" class="anchor" href="#mruby-simplehttpserver---"><span class="octicon octicon-link"></span></a>mruby-simplehttpserver   <a href="https://travis-ci.org/matsumoto-r/mruby-simplehttpserver"><img src="https://travis-ci.org/matsumoto-r/mruby-simplehttpserver.svg?branch=master" alt="Build Status"></a>
+</h1>
+
+<p>mruby-simplehttpserver is a HTTP Server with less dependency for mruby. mruby-simplehttpserver depends on mruby-io, mruby-socket and mruby-http. A Web server using mruby-simplehttpserver run on a environment which is not very rich like <a href="http://osv.io/">OSv</a> or simple Linux box.</p>
+
+<h2>
+<a name="install-by-mrbgems" class="anchor" href="#install-by-mrbgems"><span class="octicon octicon-link"></span></a>install by mrbgems</h2>
+
+<h4>
+<a name="add-confgem-line-to-build_configrb" class="anchor" href="#add-confgem-line-to-build_configrb"><span class="octicon octicon-link"></span></a>add conf.gem line to <code>build_config.rb</code>
+</h4>
+
+<div class="highlight highlight-ruby"><pre><span class="no">MRuby</span><span class="o">::</span><span class="no">Build</span><span class="o">.</span><span class="n">new</span> <span class="k">do</span> <span class="o">|</span><span class="n">conf</span><span class="o">|</span>
+
+    <span class="c1"># ... (snip) ...</span>
+
+    <span class="n">conf</span><span class="o">.</span><span class="n">gem</span> <span class="ss">:github</span> <span class="o">=&gt;</span> <span class="s1">'iij/mruby-io'</span>
+    <span class="n">conf</span><span class="o">.</span><span class="n">gem</span> <span class="ss">:github</span> <span class="o">=&gt;</span> <span class="s1">'iij/mruby-socket'</span>
+    <span class="n">conf</span><span class="o">.</span><span class="n">gem</span> <span class="ss">:github</span> <span class="o">=&gt;</span> <span class="s1">'mattn/mruby-http'</span>
+    <span class="n">conf</span><span class="o">.</span><span class="n">gem</span> <span class="ss">:github</span> <span class="o">=&gt;</span> <span class="s1">'matsumoto-r/mruby-simplehttpserver'</span>
+<span class="k">end</span>
+</pre></div>
+
+<h4>
+<a name="run-mruby" class="anchor" href="#run-mruby"><span class="octicon octicon-link"></span></a>run mruby</h4>
+
+<div class="highlight highlight-bash"><pre>./bin/mruby server.rb
+</pre></div>
+
+<h2>
+<a name="license" class="anchor" href="#license"><span class="octicon octicon-link"></span></a>License</h2>
+
+<p>under the MIT License:</p>
+
+<ul>
+<li>see LICENSE file</li>
+</ul><h2>
+<a name="example-serverrb" class="anchor" href="#example-serverrb"><span class="octicon octicon-link"></span></a>example server.rb</h2>
+
+<div class="highlight highlight-ruby"><pre><span class="c1"># </span>
+<span class="c1"># Server Configration</span>
+<span class="c1"># </span>
+
+<span class="n">server</span> <span class="o">=</span> <span class="no">SimpleHttpServer</span><span class="o">.</span><span class="n">new</span><span class="p">({</span>
+
+  <span class="ss">:server_ip</span> <span class="o">=&gt;</span> <span class="s2">"0.0.0.0"</span><span class="p">,</span>
+  <span class="ss">:port</span>  <span class="o">=&gt;</span>  <span class="mi">8000</span><span class="p">,</span>
+
+  <span class="c1"># not implemented </span>
+  <span class="ss">:document_root</span> <span class="o">=&gt;</span> <span class="s2">"./"</span><span class="p">,</span>
+<span class="p">})</span>
+
+
+<span class="c1">#</span>
+<span class="c1"># HTTP Initialize Configuration Per Request</span>
+<span class="c1">#</span>
+
+<span class="n">server</span><span class="o">.</span><span class="n">http</span> <span class="k">do</span> 
+  <span class="n">server</span><span class="o">.</span><span class="n">set_response_headers</span> <span class="o">[</span><span class="s2">"Server: my-mruby-simplehttpserver"</span><span class="o">]</span>
+  <span class="n">server</span><span class="o">.</span><span class="n">set_response_headers</span> <span class="o">[</span><span class="s2">"Date: </span><span class="si">#{</span><span class="n">server</span><span class="o">.</span><span class="n">http_date</span><span class="si">}</span><span class="s2">"</span><span class="o">]</span>
+<span class="k">end</span>
+
+<span class="c1"># </span>
+<span class="c1"># Location Configration</span>
+<span class="c1"># </span>
+
+<span class="c1"># You can use request parameters in location</span>
+<span class="c1">#   r.method</span>
+<span class="c1">#   r.schema</span>
+<span class="c1">#   r.host</span>
+<span class="c1">#   r.port</span>
+<span class="c1">#   r.path</span>
+<span class="c1">#   r.query</span>
+<span class="c1">#   r.headers</span>
+<span class="c1">#   r.body</span>
+
+<span class="c1"># /mruby location config</span>
+<span class="n">server</span><span class="o">.</span><span class="n">location</span> <span class="s2">"/mruby"</span> <span class="k">do</span> <span class="o">|</span><span class="n">r</span><span class="o">|</span>
+  <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">"POST"</span>
+    <span class="n">server</span><span class="o">.</span><span class="n">response_body</span> <span class="o">=</span> <span class="s2">"Hello mruby World. Your post is '</span><span class="si">#{</span><span class="n">r</span><span class="o">.</span><span class="n">body</span><span class="si">}</span><span class="s2">'</span><span class="se">\n</span><span class="s2">"</span>
+  <span class="k">else</span>
+    <span class="n">server</span><span class="o">.</span><span class="n">response_body</span> <span class="o">=</span> <span class="s2">"Hello mruby World at '</span><span class="si">#{</span><span class="n">r</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="s2">'</span><span class="se">\n</span><span class="s2">"</span>
+  <span class="k">end</span>
+  <span class="n">server</span><span class="o">.</span><span class="n">create_response</span>
+<span class="k">end</span>
+
+<span class="c1"># /mruby/ruby location config, location config longest match</span>
+<span class="n">server</span><span class="o">.</span><span class="n">location</span> <span class="s2">"/mruby/ruby"</span> <span class="k">do</span> <span class="o">|</span><span class="n">r</span><span class="o">|</span>
+  <span class="n">server</span><span class="o">.</span><span class="n">response_body</span> <span class="o">=</span> <span class="s2">"Hello mruby World. longest matche.</span><span class="se">\n</span><span class="s2">"</span>
+  <span class="n">server</span><span class="o">.</span><span class="n">create_response</span>
+<span class="k">end</span>
+
+<span class="n">server</span><span class="o">.</span><span class="n">location</span> <span class="s2">"/html"</span> <span class="k">do</span> <span class="o">|</span><span class="n">r</span><span class="o">|</span>
+  <span class="n">server</span><span class="o">.</span><span class="n">set_response_headers</span> <span class="o">[</span><span class="s2">"Content-Type: text/html; charset=utf-8"</span><span class="o">]</span>
+  <span class="c1"># or server.response_headers &lt;&lt; ["Content-Type: text/html; charset=utf-8"]</span>
+  <span class="n">server</span><span class="o">.</span><span class="n">response_body</span> <span class="o">=</span> <span class="s2">"&lt;H1&gt;Hello mruby World.&lt;/H1&gt;</span><span class="se">\n</span><span class="s2">"</span>
+  <span class="n">server</span><span class="o">.</span><span class="n">create_response</span>
+<span class="k">end</span>
+
+<span class="c1"># Custom error response message</span>
+<span class="n">server</span><span class="o">.</span><span class="n">location</span> <span class="s2">"/notfound"</span> <span class="k">do</span> <span class="o">|</span><span class="n">r</span><span class="o">|</span>
+  <span class="n">server</span><span class="o">.</span><span class="n">response_body</span> <span class="o">=</span> <span class="s2">"Not Found on this server: </span><span class="si">#{</span><span class="n">r</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span>
+  <span class="n">server</span><span class="o">.</span><span class="n">create_response</span> <span class="s2">"HTTP/1.0 404 Not Found"</span>
+<span class="k">end</span>
+
+<span class="n">server</span><span class="o">.</span><span class="n">run</span>
+</pre></div>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Simple HTTP Server for mruby maintained by <a href="https://github.com/matsumoto-r">matsumoto-r</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
