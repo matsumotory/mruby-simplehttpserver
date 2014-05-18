@@ -6,12 +6,13 @@ end
 
 class SimpleHttpServer
   SEP = "\r\n"
-  attr_accessor :response_body
+  attr_accessor :response_body, :response_headers
   def initialize config
     @config = config
     @host = config[:server_ip]
     @port = config[:port] 
     @docroot = config[:document_root]
+    @httpinit = nil 
     @locconf = {}
     
     # init per request
@@ -36,6 +37,10 @@ class SimpleHttpServer
         @r = HTTP::Parser.new.parse_request data
         @response_headers = []
         @response_body = nil
+        # init block called
+        unless @httpinit.nil?
+          @httpinit.call
+        end
 
         # checking location config
         key = check_location(@r.path)
@@ -81,6 +86,10 @@ class SimpleHttpServer
     set_response_headers ["Date: #{http_date}"]
     @response_body = "Service Unavailable\n"
     socket.send create_response("HTTP/1.0 503 Service Unavailable"), 0
+  end
+
+  def http &blk
+    @httpinit = blk
   end
 
   def location url, &blk
