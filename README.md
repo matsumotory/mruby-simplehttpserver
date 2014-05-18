@@ -1,4 +1,4 @@
-# mruby-simplehttpserver   [![Build Status](https://travis-ci.org/matsumoto-r/mruby-simplehttpserver.png?branch=master)](https://travis-ci.org/matsumoto-r/mruby-simplehttpserver)
+# mruby-simplehttpserver   [![Build Status](https://travis-ci.org/matsumoto-r/mruby-simplehttpserver.svg?branch=master)](https://travis-ci.org/matsumoto-r/mruby-simplehttpserver)
 SimpleHttpServer class
 ## install by mrbgems 
 - add conf.gem line to `build_config.rb` 
