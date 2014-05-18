@@ -52,7 +52,7 @@ class SimpleHttpServer
   end
 
   def get_response socket, req
-    body = "Hello OSv World.\n"
+    body = "Hello mruby-simplehttpserver World.\n"
     res = "HTTP/1.0 200 OK\r\nContent-Length: #{body.size}\r\n\r\n#{body}"
     socket.send res, 0
   end
