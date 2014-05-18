@@ -26,6 +26,8 @@ server = SimpleHttpServer.new({
 
 # /mruby location config
 server.location "/mruby" do |r|
+  server.set_response_headers ["Server: mruby-simplehttpserver"]
+  server.set_response_headers ["Date: #{server.http_date}"]
   if r.method == "POST"
     server.response_body = "Hello mruby World. Your post is '#{r.body}'\n"
   else
@@ -37,6 +39,7 @@ end
 # /mruby/ruby location config, location config longest match
 server.location "/mruby/ruby" do |r|
   server.set_response_headers ["Server: mruby-simplehttpserver"]
+  server.set_response_headers ["Date: #{server.http_date}"]
   server.response_body = "Hello mruby World. longest matche.\n"
   server.create_response
 end
@@ -44,6 +47,7 @@ end
 server.location "/html" do |r|
   server.set_response_headers ["Server: mruby-simplehttpserver"]
   server.set_response_headers ["Content-Type: text/html; charset=utf-8"]
+  server.set_response_headers ["Date: #{server.http_date}"]
   server.response_body = "<H1>Hello mruby World.</H1>\n"
   server.create_response
 end
@@ -51,6 +55,7 @@ end
 # Custom error response message
 server.location "/notfound" do |r|
   server.set_response_headers ["Server: mruby-simplehttpserver"]
+  server.set_response_headers ["Date: #{server.http_date}"]
   server.response_body = "Not Found on this server: #{r.path}\n"
   server.create_response "HTTP/1.0 404 Not Found"
 end

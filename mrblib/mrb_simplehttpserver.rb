@@ -94,4 +94,10 @@ class SimpleHttpServer
     end
     nil
   end
+
+  def http_date
+    t = Time.new.gmtime.to_s
+    tp = t.split " "
+    "#{tp[0]}, #{tp[2]} #{tp[1]} #{tp[5]} #{tp[3]} GMT"
+  end
 end
