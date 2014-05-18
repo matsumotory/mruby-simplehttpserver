@@ -14,8 +14,8 @@ class SimpleHttpServer
     @docroot = config[:document_root]
     @locconf = {}
     
-    @req = nil
-    @res = nil
+    # init per request
+    @r = nil
     @response_headers = []
     @response_body = nil
   end
@@ -31,21 +31,23 @@ class SimpleHttpServer
           data << buf
           break if buf.size != 1024
         end
-        @req = HTTP::Parser.new.parse_request data
+
+        # init per request
+        @r = HTTP::Parser.new.parse_request data
         @response_headers = []
         @response_body = nil
 
         # checking location config
-        key = check_location(@req.path)
+        key = check_location(@r.path)
 
         unless key.nil?
-          response = @locconf[key].call @req
+          response = @locconf[key].call @r
           conn.send response, 0
         else
           # default response when can't found location config
-          if @req.method == "GET"
-            get_response conn, @req
-          elsif @req.method == "POST"
+          if @r.method == "GET"
+            get_response conn, @r
+          elsif @r.method == "POST"
             error_response conn
           else
             error_response conn
@@ -69,7 +71,7 @@ class SimpleHttpServer
     status_msg + SEP + @response_headers.join("\r\n") + SEP * 2 + @response_body
   end
 
-  def get_response socket, req
+  def get_response socket, r
     @response_body = "Hello mruby-simplehttpserver World.\n"
     socket.send create_response, 0
   end
