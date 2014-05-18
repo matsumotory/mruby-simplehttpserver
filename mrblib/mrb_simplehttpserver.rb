@@ -46,11 +46,11 @@ class SimpleHttpServer
         else
           # default response when can't found location config
           if @r.method == "GET"
-            get_response conn, @r
+            error_404_response conn, @r
           elsif @r.method == "POST"
-            error_response conn
+            error_503_response conn
           else
-            error_response conn
+            error_503_response conn
           end
         end
       ensure
@@ -71,12 +71,14 @@ class SimpleHttpServer
     status_msg + SEP + @response_headers.join("\r\n") + SEP * 2 + @response_body
   end
 
-  def get_response socket, r
-    @response_body = "Hello mruby-simplehttpserver World.\n"
-    socket.send create_response, 0
+  def error_404_response socket, r
+    set_response_headers ["Date: #{http_date}"]
+    @response_body = "Not Found on this server: #{r.path}\n"
+    socket.send create_response("HTTP/1.0 404 Not Found"), 0
   end
 
-  def error_response socket
+  def error_503_response socket
+    set_response_headers ["Date: #{http_date}"]
     @response_body = "Service Unavailable\n"
     socket.send create_response("HTTP/1.0 503 Service Unavailable"), 0
   end
