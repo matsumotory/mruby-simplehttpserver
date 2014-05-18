@@ -97,7 +97,7 @@ class SimpleHttpServer
   def check_location path
     locations = @locconf.keys.sort{|a, b| b.size <=> a.size}
     locations.each do |key|
-      if path.index(key) == 0
+      if path.to_s.index(key) == 0
         return key
       end
     end
