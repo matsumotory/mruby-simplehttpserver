@@ -77,13 +77,11 @@ class SimpleHttpServer
   end
 
   def error_404_response socket, r
-    set_response_headers ["Date: #{http_date}"]
     @response_body = "Not Found on this server: #{r.path}\n"
     socket.send create_response("HTTP/1.0 404 Not Found"), 0
   end
 
   def error_503_response socket
-    set_response_headers ["Date: #{http_date}"]
     @response_body = "Service Unavailable\n"
     socket.send create_response("HTTP/1.0 503 Service Unavailable"), 0
   end
