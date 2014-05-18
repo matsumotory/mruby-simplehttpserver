@@ -75,10 +75,8 @@ class SimpleHttpServer
   end
 
   def error_response socket
-    body = "Service Unavailable\n"
-    set_response_headers ["Content-Length: #{body.size}"]
-    err = "HTTP/1.0 503 Service Unavailable" + SEP + @response_headers.join("\r\n") + SEP * 2
-    socket.send "#{err}#{body}", 0
+    @response_body = "Service Unavailable\n"
+    socket.send create_response("HTTP/1.0 503 Service Unavailable"), 0
   end
 
   def location url, &blk
