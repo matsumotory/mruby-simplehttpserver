@@ -39,7 +39,7 @@ class SimpleHttpServer
         @response_body = nil
         # init block called
         unless @httpinit.nil?
-          @httpinit.call
+          @httpinit.call @r
         end
 
         # checking location config

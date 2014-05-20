@@ -41,16 +41,7 @@ server = SimpleHttpServer.new({
 # HTTP Initialize Configuration Per Request
 #
 
-server.http do 
-  server.set_response_headers "Server" => "my-mruby-simplehttpserver"
-  server.set_response_headers "Date" => server.http_date
-end
-
-# 
-# Location Configration
-# 
-
-# You can use request parameters in location
+# You can use request parameters at http or location configration
 #   r.method
 #   r.schema
 #   r.host
@@ -59,6 +50,17 @@ end
 #   r.query
 #   r.headers
 #   r.body
+
+server.http do |r|
+  server.set_response_headers({
+    "Server" => "my-mruby-simplehttpserver",
+    "Date" => server.http_date,
+  })
+end
+
+# 
+# Location Configration
+# 
 
 # /mruby location config
 server.location "/mruby" do |r|
