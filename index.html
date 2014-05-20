@@ -79,8 +79,6 @@
 
   <span class="ss">:server_ip</span> <span class="o">=&gt;</span> <span class="s2">"0.0.0.0"</span><span class="p">,</span>
   <span class="ss">:port</span>  <span class="o">=&gt;</span>  <span class="mi">8000</span><span class="p">,</span>
-
-  <span class="c1"># not implemented </span>
   <span class="ss">:document_root</span> <span class="o">=&gt;</span> <span class="s2">"./"</span><span class="p">,</span>
 <span class="p">})</span>
 
@@ -89,16 +87,7 @@
 <span class="c1"># HTTP Initialize Configuration Per Request</span>
 <span class="c1">#</span>
 
-<span class="n">server</span><span class="o">.</span><span class="n">http</span> <span class="k">do</span> 
-  <span class="n">server</span><span class="o">.</span><span class="n">set_response_headers</span> <span class="o">[</span><span class="s2">"Server: my-mruby-simplehttpserver"</span><span class="o">]</span>
-  <span class="n">server</span><span class="o">.</span><span class="n">set_response_headers</span> <span class="o">[</span><span class="s2">"Date: </span><span class="si">#{</span><span class="n">server</span><span class="o">.</span><span class="n">http_date</span><span class="si">}</span><span class="s2">"</span><span class="o">]</span>
-<span class="k">end</span>
-
-<span class="c1"># </span>
-<span class="c1"># Location Configration</span>
-<span class="c1"># </span>
-
-<span class="c1"># You can use request parameters in location</span>
+<span class="c1"># You can use request parameters at http or location configration</span>
 <span class="c1">#   r.method</span>
 <span class="c1">#   r.schema</span>
 <span class="c1">#   r.host</span>
@@ -107,6 +96,17 @@
 <span class="c1">#   r.query</span>
 <span class="c1">#   r.headers</span>
 <span class="c1">#   r.body</span>
+
+<span class="n">server</span><span class="o">.</span><span class="n">http</span> <span class="k">do</span> <span class="o">|</span><span class="n">r</span><span class="o">|</span>
+  <span class="n">server</span><span class="o">.</span><span class="n">set_response_headers</span><span class="p">({</span>
+    <span class="s2">"Server"</span> <span class="o">=&gt;</span> <span class="s2">"my-mruby-simplehttpserver"</span><span class="p">,</span>
+    <span class="s2">"Date"</span> <span class="o">=&gt;</span> <span class="n">server</span><span class="o">.</span><span class="n">http_date</span><span class="p">,</span>
+  <span class="p">})</span>
+<span class="k">end</span>
+
+<span class="c1"># </span>
+<span class="c1"># Location Configration</span>
+<span class="c1"># </span>
 
 <span class="c1"># /mruby location config</span>
 <span class="n">server</span><span class="o">.</span><span class="n">location</span> <span class="s2">"/mruby"</span> <span class="k">do</span> <span class="o">|</span><span class="n">r</span><span class="o">|</span>
@@ -125,8 +125,8 @@
 <span class="k">end</span>
 
 <span class="n">server</span><span class="o">.</span><span class="n">location</span> <span class="s2">"/html"</span> <span class="k">do</span> <span class="o">|</span><span class="n">r</span><span class="o">|</span>
-  <span class="n">server</span><span class="o">.</span><span class="n">set_response_headers</span> <span class="o">[</span><span class="s2">"Content-Type: text/html; charset=utf-8"</span><span class="o">]</span>
-  <span class="c1"># or server.response_headers &lt;&lt; ["Content-Type: text/html; charset=utf-8"]</span>
+  <span class="n">server</span><span class="o">.</span><span class="n">set_response_headers</span> <span class="s2">"Content-type"</span> <span class="o">=&gt;</span> <span class="s2">"text/html; charset=utf-8"</span>
+  <span class="c1"># or server.response_headers &lt;&lt; "Content-type" =&gt; "text/html; charset=utf-8"</span>
   <span class="n">server</span><span class="o">.</span><span class="n">response_body</span> <span class="o">=</span> <span class="s2">"&lt;H1&gt;Hello mruby World.&lt;/H1&gt;</span><span class="se">\n</span><span class="s2">"</span>
   <span class="n">server</span><span class="o">.</span><span class="n">create_response</span>
 <span class="k">end</span>
@@ -134,7 +134,37 @@
 <span class="c1"># Custom error response message</span>
 <span class="n">server</span><span class="o">.</span><span class="n">location</span> <span class="s2">"/notfound"</span> <span class="k">do</span> <span class="o">|</span><span class="n">r</span><span class="o">|</span>
   <span class="n">server</span><span class="o">.</span><span class="n">response_body</span> <span class="o">=</span> <span class="s2">"Not Found on this server: </span><span class="si">#{</span><span class="n">r</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span>
-  <span class="n">server</span><span class="o">.</span><span class="n">create_response</span> <span class="s2">"HTTP/1.0 404 Not Found"</span>
+  <span class="n">server</span><span class="o">.</span><span class="n">create_response</span> <span class="mi">404</span>
+<span class="k">end</span>
+
+<span class="c1"># Static html file contents</span>
+<span class="n">server</span><span class="o">.</span><span class="n">location</span> <span class="s2">"/static/"</span> <span class="k">do</span> <span class="o">|</span><span class="n">r</span><span class="o">|</span>
+  <span class="n">response</span> <span class="o">=</span> <span class="s2">""</span>
+  <span class="n">is_dir</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">path</span><span class="o">[-</span><span class="mi">1</span><span class="o">]</span> <span class="o">==</span> <span class="s1">'/'</span>
+  <span class="n">is_html</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"."</span><span class="p">)</span><span class="o">[-</span><span class="mi">1</span><span class="o">]</span> <span class="o">==</span> <span class="s2">"html"</span>
+
+  <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">'GET'</span> <span class="o">&amp;&amp;</span> <span class="n">is_dir</span> <span class="o">||</span> <span class="n">is_html</span>
+    <span class="n">filename</span> <span class="o">=</span> <span class="n">server</span><span class="o">.</span><span class="n">config</span><span class="o">[</span><span class="ss">:document_root</span><span class="o">]</span> <span class="o">+</span> <span class="n">r</span><span class="o">.</span><span class="n">path</span> <span class="o">+</span> <span class="p">(</span><span class="n">is_dir</span> <span class="p">?</span> <span class="s1">'index.html'</span> <span class="p">:</span> <span class="s1">''</span><span class="p">)</span>
+    <span class="k">begin</span>
+      <span class="n">fp</span> <span class="o">=</span> <span class="no">File</span><span class="o">.</span><span class="n">open</span> <span class="n">filename</span>
+      <span class="n">server</span><span class="o">.</span><span class="n">set_response_headers</span> <span class="s2">"Content-Type"</span> <span class="o">=&gt;</span> <span class="s2">"text/html; charset=utf-8"</span>
+      <span class="c1"># TODO: Add last-modified header, need File.mtime but not implemented</span>
+      <span class="n">server</span><span class="o">.</span><span class="n">response_body</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">read</span>
+      <span class="n">response</span> <span class="o">=</span> <span class="n">server</span><span class="o">.</span><span class="n">create_response</span>
+    <span class="k">rescue</span> <span class="no">File</span><span class="o">::</span><span class="no">FileError</span>
+      <span class="n">server</span><span class="o">.</span><span class="n">response_body</span> <span class="o">=</span> <span class="s2">"Not Found on this server: </span><span class="si">#{</span><span class="n">r</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span>
+      <span class="n">response</span> <span class="o">=</span> <span class="n">server</span><span class="o">.</span><span class="n">create_response</span> <span class="mi">404</span>
+    <span class="k">rescue</span>
+      <span class="n">server</span><span class="o">.</span><span class="n">response_body</span> <span class="o">=</span> <span class="s2">"Internal Server Error</span><span class="se">\n</span><span class="s2">"</span>
+      <span class="n">response</span> <span class="o">=</span> <span class="n">server</span><span class="o">.</span><span class="n">create_response</span> <span class="mi">500</span>
+    <span class="k">ensure</span>
+      <span class="n">fp</span><span class="o">.</span><span class="n">close</span> <span class="k">if</span> <span class="n">fp</span>
+    <span class="k">end</span>
+  <span class="k">else</span>
+    <span class="n">server</span><span class="o">.</span><span class="n">response_body</span> <span class="o">=</span> <span class="s2">"Service Unavailable</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">server</span><span class="o">.</span><span class="n">create_response</span> <span class="mi">503</span>
+  <span class="k">end</span>
+  <span class="n">response</span>
 <span class="k">end</span>
 
 <span class="n">server</span><span class="o">.</span><span class="n">run</span>
