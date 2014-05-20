@@ -6,8 +6,6 @@ server = SimpleHttpServer.new({
 
   :server_ip => "0.0.0.0",
   :port  =>  8000,
-
-  # not implemented 
   :document_root => "./",
 })
 
@@ -62,6 +60,33 @@ end
 server.location "/notfound" do |r|
   server.response_body = "Not Found on this server: #{r.path}\n"
   server.create_response "HTTP/1.0 404 Not Found"
+end
+
+# Static html file contents
+server.location "/static/" do |r|
+  response = ""
+  is_dir = r.path[-1] == '/'
+  is_html = r.path.split(".")[-1] == "html"
+
+  if r.method == 'GET' && is_dir || is_html
+    filename = server.config[:document_root] + r.path + (is_dir ? 'index.html' : '')
+    begin
+      fp = File.open filename
+      server.set_response_headers ["Content-Type: test/html; charset=utf-8"]
+      # TODO: Add last-modified header, need File.mtime but not implemented
+      server.response_body = fp.read
+      response = server.create_response
+    rescue 
+      server.response_body = "Not Found on this server: #{r.path}\n"
+      response = server.create_response "HTTP/1.0 404 Not Found"
+    ensure
+      fp.close if fp
+    end
+  else
+    server.response_body = "Service Unavailable\n"
+    response = server.create_response "HTTP/1.0 503 Service Unavailable"
+  end
+  response
 end
 
 server.run

@@ -6,6 +6,7 @@ end
 
 class SimpleHttpServer
   SEP = "\r\n"
+  attr_reader :config
   attr_accessor :response_body, :response_headers
   def initialize config
     @config = config
