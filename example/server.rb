@@ -61,7 +61,7 @@ end
 # Custom error response message
 server.location "/notfound" do |r|
   server.response_body = "Not Found on this server: #{r.path}\n"
-  server.create_response "HTTP/1.0 404 Not Found"
+  server.create_response 404
 end
 
 # Static html file contents
@@ -80,16 +80,16 @@ server.location "/static/" do |r|
       response = server.create_response
     rescue File::FileError
       server.response_body = "Not Found on this server: #{r.path}\n"
-      response = server.create_response "HTTP/1.0 404 Not Found"
+      response = server.create_response 404
     rescue
       server.response_body = "Internal Server Error\n"
-      response = server.create_response "HTTP/1.0 500 Internal Server Error"
+      response = server.create_response 500
     ensure
       fp.close if fp
     end
   else
     server.response_body = "Service Unavailable\n"
-    response = server.create_response "HTTP/1.0 503 Service Unavailable"
+    response = server.create_response 503
   end
   response
 end

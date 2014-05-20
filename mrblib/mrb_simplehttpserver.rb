@@ -6,8 +6,23 @@ end
 
 class SimpleHttpServer
   SEP = "\r\n"
+  HTTP_VERSION = "HTTP/1.0"
+  STATUS_CODE_MAP = {
+
+    200 => "OK",
+    404 => "Not Found",
+    500 => "Internal Server Error",
+    503 => "Service Unavailable",
+
+  }
+
   attr_reader :config
   attr_accessor :response_body, :response_headers
+
+  def self.status_line code=200
+    "#{HTTP_VERSION} #{code} #{STATUS_CODE_MAP[code]}"
+  end
+
   def initialize config
     @config = config
     @host = config[:server_ip]
@@ -68,26 +83,23 @@ class SimpleHttpServer
     @response_headers = @response_headers.merge headers
   end
 
-  def create_response status_msg=nil
-    if status_msg.nil?
-      status_msg = "HTTP/1.0 200 OK"
-    end
+  def create_response code=200
     set_response_headers "content-length" => @response_body.size
     headers_ary = []
     @response_headers.keys.each do |k|
       headers_ary << ["#{k.upcase.capitalize}: #{@response_headers[k]}"]
     end
-    status_msg + SEP + headers_ary.join("\r\n") + SEP * 2 + @response_body
+    SimpleHttpServer.status_line(code) + SEP + headers_ary.join("\r\n") + SEP * 2 + @response_body
   end
 
   def error_404_response socket, r
     @response_body = "Not Found on this server: #{r.path}\n"
-    socket.send create_response("HTTP/1.0 404 Not Found"), 0
+    socket.send create_response(404), 0
   end
 
   def error_503_response socket
     @response_body = "Service Unavailable\n"
-    socket.send create_response("HTTP/1.0 503 Service Unavailable"), 0
+    socket.send create_response(503), 0
   end
 
   def http &blk
