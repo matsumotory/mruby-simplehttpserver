@@ -25,9 +25,9 @@ under the MIT License:
 
 ## example server.rb
 ```ruby
-#
+# 
 # Server Configration
-#
+# 
 
 server = SimpleHttpServer.new({
 
@@ -36,18 +36,19 @@ server = SimpleHttpServer.new({
   :document_root => "./",
 })
 
+
 #
 # HTTP Initialize Configuration Per Request
 #
 
-server.http do
-  server.set_response_headers ["Server: my-mruby-simplehttpserver"]
-  server.set_response_headers ["Date: #{server.http_date}"]
+server.http do 
+  server.set_response_headers "Server" => "my-mruby-simplehttpserver"
+  server.set_response_headers "Date" => server.http_date
 end
 
-#
+# 
 # Location Configration
-#
+# 
 
 # You can use request parameters in location
 #   r.method
@@ -76,8 +77,8 @@ server.location "/mruby/ruby" do |r|
 end
 
 server.location "/html" do |r|
-  server.set_response_headers ["Content-Type: text/html; charset=utf-8"]
-  # or server.response_headers << ["Content-Type: text/html; charset=utf-8"]
+  server.set_response_headers "Content-type" => "text/html; charset=utf-8"
+  # or server.response_headers << "Content-type" => "text/html; charset=utf-8"
   server.response_body = "<H1>Hello mruby World.</H1>\n"
   server.create_response
 end
@@ -98,12 +99,16 @@ server.location "/static/" do |r|
     filename = server.config[:document_root] + r.path + (is_dir ? 'index.html' : '')
     begin
       fp = File.open filename
-      server.set_response_headers ["Content-Type: test/html; charset=utf-8"]
+      server.set_response_headers "Content-Type" => "text/html; charset=utf-8"
+      # TODO: Add last-modified header, need File.mtime but not implemented
       server.response_body = fp.read
       response = server.create_response
-    rescue 
+    rescue File::FileError
       server.response_body = "Not Found on this server: #{r.path}\n"
       response = server.create_response "HTTP/1.0 404 Not Found"
+    rescue
+      server.response_body = "Internal Server Error\n"
+      response = server.create_response "HTTP/1.0 500 Internal Server Error"
     ensure
       fp.close if fp
     end
@@ -116,4 +121,3 @@ end
 
 server.run
 ```
-

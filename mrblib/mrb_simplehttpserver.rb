@@ -12,13 +12,12 @@ class SimpleHttpServer
     @config = config
     @host = config[:server_ip]
     @port = config[:port] 
-    @docroot = config[:document_root]
     @httpinit = nil 
     @locconf = {}
     
     # init per request
     @r = nil
-    @response_headers = []
+    @response_headers = {}
     @response_body = nil
   end
 
@@ -36,7 +35,7 @@ class SimpleHttpServer
 
         # init per request
         @r = HTTP::Parser.new.parse_request data
-        @response_headers = []
+        @response_headers = {}
         @response_body = nil
         # init block called
         unless @httpinit.nil?
@@ -65,16 +64,20 @@ class SimpleHttpServer
     end
   end
 
-  def set_response_headers response_headers
-    @response_headers << response_headers
+  def set_response_headers headers
+    @response_headers = @response_headers.merge headers
   end
 
   def create_response status_msg=nil
     if status_msg.nil?
       status_msg = "HTTP/1.0 200 OK"
     end
-    set_response_headers ["Content-Length: #{@response_body.size}"]
-    status_msg + SEP + @response_headers.join("\r\n") + SEP * 2 + @response_body
+    set_response_headers "content-length" => @response_body.size
+    headers_ary = []
+    @response_headers.keys.each do |k|
+      headers_ary << ["#{k.upcase.capitalize}: #{@response_headers[k]}"]
+    end
+    status_msg + SEP + headers_ary.join("\r\n") + SEP * 2 + @response_body
   end
 
   def error_404_response socket, r
