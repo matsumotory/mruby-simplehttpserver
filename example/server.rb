@@ -15,8 +15,10 @@ server = SimpleHttpServer.new({
 #
 
 server.http do 
-  server.set_response_headers "Server" => "my-mruby-simplehttpserver"
-  server.set_response_headers "Date" => server.http_date
+  server.set_response_headers({
+    "Server" => "my-mruby-simplehttpserver",
+    "Date" => server.http_date,
+  })
 end
 
 # 
