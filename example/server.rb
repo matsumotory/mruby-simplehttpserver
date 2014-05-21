@@ -53,7 +53,6 @@ end
 
 server.location "/html" do |r|
   server.set_response_headers "Content-type" => "text/html; charset=utf-8"
-  # or server.response_headers << "Content-type" => "text/html; charset=utf-8"
   server.response_body = "<H1>Hello mruby World.</H1>\n"
   server.create_response
 end
@@ -67,8 +66,6 @@ end
 # Static html file contents
 server.location "/static/" do |r|
   response = ""
-  #is_dir = r.path[-1] == '/'
-  #is_html = r.path.split(".")[-1] == "html"
 
   if r.method == 'GET' && r.path.is_dir? || r.path.is_html?
     filename = server.config[:document_root] + r.path
