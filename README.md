@@ -24,6 +24,7 @@ under the MIT License:
 - see LICENSE file
 
 ## example server.rb
+If you see more example, see [example/server.rb](https://github.com/matsumoto-r/mruby-simplehttpserver/blob/master/example/server.rb)
 ```ruby
 # 
 # Server Configration
