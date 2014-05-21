@@ -67,11 +67,12 @@ end
 # Static html file contents
 server.location "/static/" do |r|
   response = ""
-  is_dir = r.path[-1] == '/'
-  is_html = r.path.split(".")[-1] == "html"
+  #is_dir = r.path[-1] == '/'
+  #is_html = r.path.split(".")[-1] == "html"
 
-  if r.method == 'GET' && is_dir || is_html
-    filename = server.config[:document_root] + r.path + (is_dir ? 'index.html' : '')
+  if r.method == 'GET' && r.path.is_dir? || r.path.is_html?
+    filename = server.config[:document_root] + r.path
+    filename += r.path.is_dir? ? 'index.html' : ''
     begin
       fp = File.open filename
       server.set_response_headers "Content-Type" => "text/html; charset=utf-8"

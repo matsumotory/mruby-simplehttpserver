@@ -72,54 +72,5 @@ server.location "/mruby" do |r|
   server.create_response
 end
 
-# /mruby/ruby location config, location config longest match
-server.location "/mruby/ruby" do |r|
-  server.response_body = "Hello mruby World. longest matche.\n"
-  server.create_response
-end
-
-server.location "/html" do |r|
-  server.set_response_headers "Content-type" => "text/html; charset=utf-8"
-  # or server.response_headers << "Content-type" => "text/html; charset=utf-8"
-  server.response_body = "<H1>Hello mruby World.</H1>\n"
-  server.create_response
-end
-
-# Custom error response message
-server.location "/notfound" do |r|
-  server.response_body = "Not Found on this server: #{r.path}\n"
-  server.create_response 404
-end
-
-# Static html file contents
-server.location "/static/" do |r|
-  response = ""
-  is_dir = r.path[-1] == '/'
-  is_html = r.path.split(".")[-1] == "html"
-
-  if r.method == 'GET' && is_dir || is_html
-    filename = server.config[:document_root] + r.path + (is_dir ? 'index.html' : '')
-    begin
-      fp = File.open filename
-      server.set_response_headers "Content-Type" => "text/html; charset=utf-8"
-      # TODO: Add last-modified header, need File.mtime but not implemented
-      server.response_body = fp.read
-      response = server.create_response
-    rescue File::FileError
-      server.response_body = "Not Found on this server: #{r.path}\n"
-      response = server.create_response 404
-    rescue
-      server.response_body = "Internal Server Error\n"
-      response = server.create_response 500
-    ensure
-      fp.close if fp
-    end
-  else
-    server.response_body = "Service Unavailable\n"
-    response = server.create_response 503
-  end
-  response
-end
-
 server.run
 ```

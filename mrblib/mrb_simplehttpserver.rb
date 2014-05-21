@@ -125,4 +125,17 @@ class SimpleHttpServer
     tp = t.split " "
     "#{tp[0]}, #{tp[2]} #{tp[1]} #{tp[5]} #{tp[3]} GMT"
   end
+  
+end
+
+class String
+  
+  def is_dir?
+    self[-1] == '/'
+  end
+
+  def is_html?
+    self.split(".")[-1] == "html"
+  end
+
 end
