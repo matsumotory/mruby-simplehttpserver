@@ -87,7 +87,9 @@ class SimpleHttpServer
     set_response_headers "content-length" => @response_body.size
     headers_ary = []
     @response_headers.keys.each do |k|
-      headers_ary << ["#{k.upcase.capitalize}: #{@response_headers[k]}"]
+      unless @response_headers[k].nil?
+        headers_ary << ["#{k.upcase.capitalize}: #{@response_headers[k]}"]
+      end
     end
     SimpleHttpServer.status_line(code) + SEP + headers_ary.join("\r\n") + SEP * 2 + @response_body
   end
@@ -135,9 +137,11 @@ class SimpleHttpServer
       @response_body = fp.read
       response = create_response
     rescue File::FileError
+      set_response_headers "Content-Type" => nil
       @response_body = "Not Found on this server: #{r.path}\n"
       response = create_response 404
     rescue
+      set_response_headers "Content-Type" => nil
       @response_body = "Internal Server Error\n"
       response = create_response 500
     ensure
