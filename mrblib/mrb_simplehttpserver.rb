@@ -26,10 +26,10 @@ class SimpleHttpServer
   def initialize config
     @config = config
     @host = config[:server_ip]
-    @port = config[:port] 
-    @httpinit = nil 
+    @port = config[:port]
+    @httpinit = nil
     @locconf = {}
-    
+
     # init per request
     @r = nil
     @response_headers = {}
@@ -42,7 +42,7 @@ class SimpleHttpServer
       conn = server.accept
       begin
         data = ''
-        while true 
+        while true
           buf = conn.recv(1024)
           data << buf
           break if buf.size != 1024
@@ -125,11 +125,31 @@ class SimpleHttpServer
     tp = t.split " "
     "#{tp[0]}, #{tp[2]} #{tp[1]} #{tp[5]} #{tp[3]} GMT"
   end
-  
+
+  def file_response r, filename
+    response = ""
+    begin
+      fp = File.open filename
+      set_response_headers "Content-Type" => "text/html; charset=utf-8"
+      # TODO: Add last-modified header, need File.mtime but not implemented
+      @response_body = fp.read
+      response = create_response
+    rescue File::FileError
+      @response_body = "Not Found on this server: #{r.path}\n"
+      response = create_response 404
+    rescue
+      @response_body = "Internal Server Error\n"
+      response = create_response 500
+    ensure
+      fp.close if fp
+    end
+    response
+  end
+
 end
 
 class String
-  
+
   def is_dir?
     self[-1] == '/'
   end

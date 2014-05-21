@@ -65,31 +65,16 @@ end
 
 # Static html file contents
 server.location "/static/" do |r|
-  response = ""
-
   if r.method == 'GET' && r.path.is_dir? || r.path.is_html?
     filename = server.config[:document_root] + r.path
     filename += r.path.is_dir? ? 'index.html' : ''
-    begin
-      fp = File.open filename
-      server.set_response_headers "Content-Type" => "text/html; charset=utf-8"
-      # TODO: Add last-modified header, need File.mtime but not implemented
-      server.response_body = fp.read
-      response = server.create_response
-    rescue File::FileError
-      server.response_body = "Not Found on this server: #{r.path}\n"
-      response = server.create_response 404
-    rescue
-      server.response_body = "Internal Server Error\n"
-      response = server.create_response 500
-    ensure
-      fp.close if fp
-    end
+
+    server.set_response_headers "Content-Type" => "text/html; charset=utf-8"
+    server.file_response r, filename
   else
     server.response_body = "Service Unavailable\n"
-    response = server.create_response 503
+    server.create_response 503
   end
-  response
 end
 
 server.run
