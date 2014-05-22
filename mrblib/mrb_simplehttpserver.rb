@@ -6,7 +6,9 @@ end
 
 class SimpleHttpServer
   SEP = "\r\n"
+  RECV_BUF = 1024
   HTTP_VERSION = "HTTP/1.0"
+  # TODO: Add other HTTP status code and message
   STATUS_CODE_MAP = {
 
     200 => "OK",
@@ -43,9 +45,9 @@ class SimpleHttpServer
       begin
         data = ''
         while true
-          buf = conn.recv(1024)
+          buf = conn.recv RECV_BUF
           data << buf
-          break if buf.size != 1024
+          break if buf.size != RECV_BUF
         end
 
         # init per request
