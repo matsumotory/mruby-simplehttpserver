@@ -38,6 +38,11 @@ class SimpleHttpServer
     @response_body = nil
   end
 
+  def debug msg
+    p msg if @config[:debug]
+  end
+
+
   def run
     server = TCPServer.new @host, @port
     while true
@@ -76,6 +81,7 @@ class SimpleHttpServer
           end
         end
       ensure
+        debug "close: #{@r.inspect}"
         conn.close
       end
     end

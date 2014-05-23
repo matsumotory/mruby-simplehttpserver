@@ -7,6 +7,7 @@ server = SimpleHttpServer.new({
   :server_ip => "0.0.0.0",
   :port  =>  8000,
   :document_root => "./",
+  :debug => true,
 })
 
 
@@ -42,6 +43,7 @@ server.location "/mruby" do |r|
   else
     server.response_body = "Hello mruby World at '#{r.path}'\n"
   end
+  server.response_body += r.inspect + "\n"
   server.create_response
 end
 
