@@ -29,6 +29,8 @@ class SimpleHttpServer
     @config = config
     @host = config[:server_ip]
     @port = config[:port]
+    @nonblock = config[:nonblock]
+    @server = nil
     @httpinit = nil
     @locconf = {}
 
@@ -44,9 +46,16 @@ class SimpleHttpServer
 
 
   def run
-    server = TCPServer.new @host, @port
+    @server ||= TCPServer.new @host, @port
     while true
-      conn = server.accept
+      conn = nil
+      begin
+        conn = @nonblock ? @server.accept_nonblock : @server.accept
+      rescue
+        return
+      end
+
+      # send response to client
       begin
         data = ''
         while true
