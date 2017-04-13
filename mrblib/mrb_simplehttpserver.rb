@@ -153,7 +153,7 @@ class SimpleHttpServer
       # TODO: Add last-modified header, need File.mtime but not implemented
       @response_body = fp.read
       response = create_response
-    rescue File::FileError
+    rescue IOError
       set_response_headers "Content-Type" => nil
       @response_body = "Not Found on this server: #{r.path}\n"
       response = create_response 404
