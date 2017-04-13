@@ -145,15 +145,28 @@ class SimpleHttpServer
     "#{tp[0]}, #{tp[2]} #{tp[1]} #{tp[5]} #{tp[3]} GMT"
   end
 
+  def content_type filename
+    ext = filename.split('.')[-1]
+
+    case ext
+    when 'txt', 'html', 'css'
+      "text/#{ext}; charset=utf-8"
+    when 'js'
+      'text/javascript; charset=utf-8'
+    else
+      'application/octet-stream; charset=utf-8'
+    end
+  end
+
   def file_response r, filename
     response = ""
     begin
       fp = File.open filename
-      set_response_headers "Content-Type" => "text/html; charset=utf-8"
+      set_response_headers "Content-Type" => content_type(filename)
       # TODO: Add last-modified header, need File.mtime but not implemented
       @response_body = fp.read
       response = create_response
-    rescue IOError
+    rescue File::FileError
       set_response_headers "Content-Type" => nil
       @response_body = "Not Found on this server: #{r.path}\n"
       response = create_response 404
