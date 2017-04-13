@@ -153,6 +153,10 @@ class SimpleHttpServer
       "text/#{ext}; charset=utf-8"
     when 'js'
       'text/javascript; charset=utf-8'
+    when 'gif', 'jpeg', 'png', 'tiff'
+      "image/#{ext}; charset=utf-8"
+    when 'json', 'xml'
+      "application/#{ext}; charset=utf-8"
     else
       'application/octet-stream; charset=utf-8'
     end
