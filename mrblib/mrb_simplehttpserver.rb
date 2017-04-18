@@ -151,14 +151,22 @@ class SimpleHttpServer
     case ext
     when 'txt', 'html', 'css'
       "text/#{ext}; charset=utf-8"
-    when 'js'
-      'text/javascript; charset=utf-8'
-    when 'gif', 'jpeg', 'png', 'tiff'
-      "image/#{ext}; charset=utf-8"
-    when 'json', 'xml'
+    when 'js', 'json', 'xml'
       "application/#{ext}; charset=utf-8"
+    when 'gif', 'jpeg', 'png', 'tiff'
+      "image/#{ext}"
+    when 'svg'
+      'image/svg+xml'
+    when 'otf', 'ttf'
+      'application/font-sfnt'
+    when 'eot'
+      'application/vnd.ms-fontobject'
+    when 'woff'
+      'application/font-woff'
+    when 'woff2'
+      'font/woff2'
     else
-      'application/octet-stream; charset=utf-8'
+      'application/octet-stream'
     end
   end
 
