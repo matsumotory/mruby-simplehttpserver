@@ -173,7 +173,7 @@ class SimpleHttpServer
   def file_response r, filename
     response = ""
     begin
-      fp = File.open filename
+      fp = File.open filename, 'rb'
       set_response_headers "Content-Type" => content_type(filename)
       # TODO: Add last-modified header, need File.mtime but not implemented
       @response_body = fp.read
