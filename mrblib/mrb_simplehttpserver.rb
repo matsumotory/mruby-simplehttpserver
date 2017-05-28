@@ -70,7 +70,12 @@ class SimpleHttpServer
   end
 
   def request_to_env(req)
-    req.headers.merge('REQUEST_METHOD' => req.method, 'PATH_INFO' => req.path)
+    req.headers.merge(
+      'REQUEST_METHOD' => req.method,
+      'PATH_INFO' => req.path,
+      'QUERY_STRING' => req.query,
+      'HTTP_VERSION' => HTTP_VERSION
+    )
   end
 
   def create_response(code, headers, body)
