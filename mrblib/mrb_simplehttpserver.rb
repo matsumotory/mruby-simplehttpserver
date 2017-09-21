@@ -19,6 +19,7 @@ class SimpleHttpServer
     @port     = config[:port]
     @nonblock = config[:nonblock]
     @app      = config[:app]
+    @parser   = HTTP::Parser.new
     @server   = nil
   end
 
@@ -62,7 +63,7 @@ class SimpleHttpServer
   end
 
   def on_data(data)
-    request               = HTTP::Parser.new.parse_request(data)
+    request               = @parser.parse_request(data)
     env                   = request_to_env(request)
     status, headers, body = @app.call(env)
 
