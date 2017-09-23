@@ -8,6 +8,7 @@ class SimpleHttpServer
   SEP          = "\r\n".freeze
   RECV_BUF     = 1024
   HTTP_VERSION = 'HTTP/1.1'.freeze
+  ROOT_PATH    = '/'.freeze
 
   def self.status_line(code = 200)
     "#{HTTP_VERSION} #{code} #{Shelf::Utils::HTTP_STATUS_CODES[code]}"
@@ -72,9 +73,9 @@ class SimpleHttpServer
   def request_to_env(req)
     req.headers.merge(
       'REQUEST_METHOD' => req.method,
-      'PATH_INFO' => req.path,
-      'QUERY_STRING' => req.query,
-      'HTTP_VERSION' => HTTP_VERSION
+      'PATH_INFO'      => req.path || ROOT_PATH,
+      'QUERY_STRING'   => req.query,
+      'HTTP_VERSION'   => HTTP_VERSION
     )
   end
 
