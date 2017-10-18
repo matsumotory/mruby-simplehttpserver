@@ -21,26 +21,25 @@ class SimpleHttpServer
     @nonblock = config[:nonblock]
     @app      = config[:app]
     @parser   = HTTP::Parser.new
-    @server   = nil
   end
 
   attr_reader :config, :host, :port
 
   def run
-    @server ||= TCPServer.new(@host, @port)
+    server = TCPServer.new(host, port)
 
     loop do
-      conn = accept_connection(@server, @nonblock)
-
+      conn = accept_connection(server, @nonblock)
       return unless conn
 
       begin
         data = receive_data(conn)
         res  = on_data(data)
         conn.send(res, 0) if res
+      rescue
+        raise "Connection reset by peer" if config[:debug] && conn.closed?
       ensure
-        conn.close
-        data.clear
+        conn.close rescue nil
       end
     end
   end
@@ -57,10 +56,8 @@ class SimpleHttpServer
     loop do
       buf = conn.recv RECV_BUF
       data << buf
-      break if buf.size != RECV_BUF
+      return data if buf.size != RECV_BUF
     end
-
-    data
   end
 
   def on_data(data)
