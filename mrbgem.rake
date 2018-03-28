@@ -8,6 +8,7 @@ MRuby::Gem::Specification.new('mruby-simplehttpserver') do |spec|
   spec.add_dependency('mruby-string-ext', core: 'mruby-string-ext')
   spec.add_dependency('mruby-time', core: 'mruby-time')
   spec.add_dependency('mruby-http')
+  spec.add_dependency('mruby-shelf')
 
   if MRuby::Source::MRUBY_VERSION >= '1.4.0'
     spec.add_dependency('mruby-io', core: 'mruby-io')
