@@ -2,77 +2,67 @@
 
 mruby-simplehttpserver is a HTTP Server with less dependency for mruby. mruby-simplehttpserver depends on mruby-io, mruby-socket and mruby-http. A Web server using mruby-simplehttpserver run on a environment which is not very rich like [OSv](http://osv.io/) or simple Linux box.
 
-## install by mrbgems 
-#### add conf.gem line to `build_config.rb` 
+### Install by mrbgems
+
+add conf.gem line to `build_config.rb`:
+
 ```ruby
 MRuby::Build.new do |conf|
 
     # ... (snip) ...
 
-    conf.gem :github => 'iij/mruby-io'
-    conf.gem :github => 'iij/mruby-pack'
-    conf.gem :github => 'iij/mruby-socket'
-    conf.gem :github => 'mattn/mruby-http'
-    conf.gem :github => 'matsumoto-r/mruby-simplehttpserver'
+    conf.gem mgem: 'mruby-simplehttpserver'
 end
 ```
-#### run mruby
-```bash
-./bin/mruby server.rb
-```
-## License
-under the MIT License:
-- see LICENSE file
 
-## example server.rb
-If you see more example, see [example/server.rb](https://github.com/matsumoto-r/mruby-simplehttpserver/blob/master/example/server.rb)
+## How to use SimpleHttpServer
+
+SimpleHttpServer class provides a HTTP Server.
+
+SimpleHttpServer has a [Rack](http://rack.github.io/)-like interface, so you should provide an "app": an object that responds to `#call`, taking the environment hash as a parameter, and returning an Array with three elements:
+
+- HTTP Status Code
+- Headers hash
+- Body
+
+#### Example: a simple "OK" server
+
+The following example code can be used as the basis of a HTTP Server which returning "OK":
+
 ```ruby
-# 
-# Server Configration
-# 
+app = -> (env) { [200, { 'Content-Type' => 'text/plain' }, ['OK']] }
 
-server = SimpleHttpServer.new({
-
-  :server_ip => "0.0.0.0",
-  :port  =>  8000,
-  :document_root => "./",
-})
-
-
-#
-# HTTP Initialize Configuration Per Request
-#
-
-# You can use request parameters at http or location configration
-#   r.method
-#   r.schema
-#   r.host
-#   r.port
-#   r.path
-#   r.query
-#   r.headers
-#   r.body
-
-server.http do |r|
-  server.set_response_headers({
-    "Server" => "my-mruby-simplehttpserver",
-    "Date" => server.http_date,
-  })
-end
-
-# 
-# Location Configration
-# 
-
-# /mruby location config
-server.location "/mruby" do |r|
-  if r.method == "POST"
-    server.response_body = "Hello mruby World. Your post is '#{r.body}'\n"
-  else
-    server.response_body = "Hello mruby World at '#{r.path}'\n"
-  end
-  server.create_response
-end
+server = SimpleHttpServer.new(
+  server_ip: 'localhost',
+  port: 8000,
+  app: app,
+)
 
 server.run
 ```
+
+`SimpleHttpServer#run` invokes a server that returns "OK". (If you want to stop the server, enter `^C` key.) You can see its response with curl:
+
+```console
+$ curl localhost:8000
+OK
+```
+
+If you see more examples, see [example/server.rb](https://github.com/matsumoto-r/mruby-simplehttpserver/blob/master/example/server.rb).
+
+#### What does `env` receive?
+
+`env`, which an "app" takes as a parameter, receives a hash object includes request headers and the following parameters:
+
+- REQUEST\_METHOD ... GET, PUT, POST, DELETE and so on.
+- PATH\_INFO ... request path or '/'
+- QUERY\_STRING ... query string
+- HTTP\_VERSION ... 'HTTP/1.1'
+
+If you want to see how to parse an request, see also [mattn/mruby-http](https://github.com/mattn/mruby-http).
+
+## License
+
+under the MIT License:
+
+- see [LICENSE](./LICENSE) file
