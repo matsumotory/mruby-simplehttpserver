@@ -2,14 +2,14 @@ language: c
 compiler:
   - gcc
   - clang
+env:
+  - MRUBY_VERSION=1.2.0
+  - MRUBY_VERSION=1.3.0
+  - MRUBY_VERSION=1.4.0
+  - MRUBY_VERSION=master
 before_install:
-    - sudo apt-get -qq update
+  - sudo apt-get -qq update
 install:
-    - sudo apt-get -qq install rake bison git gperf
-before_script:
-  - cd ../
-  - git clone https://github.com/mruby/mruby.git
-  - cd mruby
-  - cp -fp ../mruby-simplehttpserver/.travis_build_config.rb build_config.rb
-script: 
-  - make all test
+  - sudo apt-get -qq install rake bison git gperf
+script:
+  - rake test
