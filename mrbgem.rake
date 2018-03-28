@@ -17,4 +17,6 @@ MRuby::Gem::Specification.new('mruby-simplehttpserver') do |spec|
     spec.add_dependency('mruby-io')
     spec.add_dependency('mruby-socket')
   end
+
+  spec.add_test_dependency('mruby-process')
 end
