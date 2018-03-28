@@ -61,6 +61,13 @@ If you see more examples, see [example/server.rb](https://github.com/matsumoto-r
 
 If you want to see how to parse an request, see also [mattn/mruby-http](https://github.com/mattn/mruby-http).
 
+Public Instance Methods
+---
+
+### run()
+
+A process requests on sock.
+
 ## License
 
 under the MIT License:
