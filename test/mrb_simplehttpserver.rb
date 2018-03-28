@@ -17,10 +17,10 @@ app = Proc.new do |env|
     body = "Hello mruby World.\n"
   when '/html'
     headers['Content-type'] = 'text/html; charset=utf-8'
-    body = "<H1>Hello mruby World.</H1>\n"
+    body = '<H1>Hello mruby World.</H1>'
   when '/notfound'
     # Custom error response message
-    body = "Not Found on this server: #{path}\n"
+    body = "Not Found on this server: #{path}"
     code = 404
   end
 
@@ -57,4 +57,32 @@ assert 'SimpleHttpServer#config' do
 
   assert_include server.config, :nonblock
   assert_true server.config[:nonblock]
+end
+
+assert 'SimpleHttpServer#run' do
+  server = SimpleHttpServer.new(server_ip: host, port: port, app: app)
+  pid = fork { server.run }
+
+  h = HTTP::Parser.new()
+
+  res = `curl -si localhost:8000/mruby`
+  h.parse_response(res) {|x|
+    assert_equal 'GET', x.method
+    assert_equal 'mruby-simplehttpserver', x.headers['Server']
+    assert_nil x.headers['Content-type']
+    assert_equal "Hello mruby World.\n", x.body
+  }
+
+  res = `curl -si localhost:8000/html`
+  h.parse_response(res) {|x|
+    assert_equal 'text/html; charset=utf-8', x.headers['Content-type']
+    assert_equal "<H1>Hello mruby World.</H1>", x.body
+  }
+
+  res = `curl -si localhost:8000/notfound`
+  h.parse_response(res) {|x|
+    assert_equal 'Not Found on this server: /notfound', x.body
+  }
+
+  Process.kill :TERM, pid
 end
