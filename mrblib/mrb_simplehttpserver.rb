@@ -18,7 +18,8 @@ class SimpleHttpServer
     @config   = config
     @host     = config[:server_ip]
     @port     = config[:port]
-    @nonblock = config[:nonblock]
+    @nonblock = config[:nonblock] != false
+    @timeout  = config[:timeout] || 5
     @app      = config[:app]
     @parser   = HTTP::Parser.new
   end
@@ -29,34 +30,31 @@ class SimpleHttpServer
     server = TCPServer.new(host, port)
 
     loop do
-      conn = accept_connection(server, @nonblock)
-      return unless conn
+      sock = server.accept
 
       begin
-        data = receive_data(conn)
-        res  = on_data(data)
-        conn.send(res, 0) if res
+        data = receive_data(sock)
+        res  = on_data(data) if data
+        sock.send(res, 0)    if res
       rescue
-        raise "Connection reset by peer" if config[:debug] && conn.closed?
+        raise 'Connection reset by peer' if config[:debug] && sock.closed?
       ensure
-        conn.close rescue nil
+        sock.close rescue nil
       end
     end
   end
 
-  def accept_connection(socket, nonblock = false)
-    nonblock ? socket.accept_nonblock : socket.accept
-  rescue
-    nil
-  end
-
-  def receive_data(conn)
+  def receive_data(sock)
     data = ''
+    time = Time.now if @nonblock
 
     loop do
-      buf = conn.recv RECV_BUF
-      data << buf
-      return data if buf.size != RECV_BUF
+      begin
+        data << buf = sock.recv(RECV_BUF, @nonblock ? Socket::MSG_DONTWAIT : 0)
+        return data if buf.size != RECV_BUF
+      rescue
+        next if (Time.now - time) < @timeout
+      end
     end
   end
 
@@ -89,7 +87,7 @@ class SimpleHttpServer
   end
 
   def http_date
-    tp = Time.new.gmtime.to_s.split(' ')
+    tp = Time.now.gmtime.to_s.split
     "#{tp[0]}, #{tp[2]} #{tp[1]} #{tp[5]} #{tp[3]} GMT"
   end
 end
