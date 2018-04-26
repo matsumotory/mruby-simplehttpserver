@@ -26,6 +26,7 @@ class SimpleHttpServer
   RECV_BUF     = 1024
   HTTP_VERSION = 'HTTP/1.1'.freeze
   ROOT_PATH    = '/'.freeze
+
   # Initializes the server via a config hash map.
   #
   # @param [ Hash<Symbol, Object> ] config Required are :host, :port and :app
@@ -130,9 +131,6 @@ class SimpleHttpServer
       Shelf::SHELF_INPUT      => io
     )
   end
-
-  def create_response(code, headers, body)
-    headers[Shelf::DATE] ||= http_date
 
   # Convert the response returned by @app.call into a HTTP response.
   # https://www.w3.org/Protocols/rfc2616/rfc2616-sec6.html
