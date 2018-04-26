@@ -60,29 +60,33 @@ assert 'SimpleHttpServer#config' do
 end
 
 assert 'SimpleHttpServer#run' do
-  server = SimpleHttpServer.new(server_ip: host, port: port, app: app)
-  pid = fork { server.run }
+  begin
+    server = SimpleHttpServer.new(server_ip: host, port: port, app: app)
+    pid = fork { server.run }
 
-  h = HTTP::Parser.new()
+    h = HTTP::Parser.new
 
-  res = `curl -si localhost:8000/mruby`
-  h.parse_response(res) {|x|
-    assert_equal 'GET', x.method
-    assert_equal 'mruby-simplehttpserver', x.headers['Server']
-    assert_nil x.headers['Content-type']
-    assert_equal "Hello mruby World.\n", x.body
-  }
+    res = `curl -si localhost:8000/mruby`
+    h.parse_response(res) {|x|
+      assert_equal 'GET', x.method
+      assert_equal 'mruby-simplehttpserver', x.headers['Server']
+      assert_nil x.headers['Content-type']
+      assert_equal "Hello mruby World.\n", x.body
+    }
 
-  res = `curl -si localhost:8000/html`
-  h.parse_response(res) {|x|
-    assert_equal 'text/html; charset=utf-8', x.headers['Content-type']
-    assert_equal "<H1>Hello mruby World.</H1>", x.body
-  }
+    res = `curl -si localhost:8000/html`
+    h.parse_response(res) {|x|
+      assert_equal 'text/html; charset=utf-8', x.headers['Content-type']
+      assert_equal "<H1>Hello mruby World.</H1>", x.body
+    }
 
-  res = `curl -si localhost:8000/notfound`
-  h.parse_response(res) {|x|
-    assert_equal 'Not Found on this server: /notfound', x.body
-  }
+    res = `curl -si localhost:8000/notfound`
+    h.parse_response(res) {|x|
+      assert_equal 'Not Found on this server: /notfound', x.body
+    }
 
-  Process.kill :TERM, pid
+    Process.kill :TERM, pid
+  rescue NoMethodError => e
+    skip e.message
+  end
 end

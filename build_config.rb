@@ -20,25 +20,11 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-require "#{MRUBY_ROOT}/lib/mruby/source"
+MRuby::Build.new do |conf|
+  toolchain ENV.fetch('TOOLCHAIN', :gcc)
 
-MRuby::Gem::Specification.new('mruby-simplehttpserver') do |spec|
-  spec.license = 'MIT'
-  spec.authors = ['MATSUMOTO Ryosuke', 'KATZER Sebastian']
-  spec.version = '1.0.0'
+  conf.enable_debug
+  conf.enable_test
 
-  spec.add_dependency('mruby-string-ext', core: 'mruby-string-ext')
-  spec.add_dependency('mruby-time', core: 'mruby-time')
-  spec.add_dependency('mruby-http')
-  spec.add_dependency('mruby-shelf')
-
-  if MRuby::Source::MRUBY_VERSION >= '1.4.0'
-    spec.add_dependency('mruby-io', core: 'mruby-io')
-    spec.add_dependency('mruby-socket', core: 'mruby-socket')
-  else
-    spec.add_dependency('mruby-io')
-    spec.add_dependency('mruby-socket')
-  end
-
-  spec.add_test_dependency('mruby-process', mgem: 'mruby-process2')
+  conf.gem __dir__
 end
