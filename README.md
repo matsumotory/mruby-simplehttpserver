@@ -33,7 +33,7 @@ The following example code can be used as the basis of a HTTP Server which retur
 app = -> (env) { [200, { 'Content-Type' => 'text/plain' }, ['OK']] }
 
 server = SimpleHttpServer.new(
-  server_ip: 'localhost',
+  host: 'localhost',
   port: 8000,
   app: app,
 )
