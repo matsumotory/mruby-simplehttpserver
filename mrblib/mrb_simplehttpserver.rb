@@ -141,7 +141,8 @@ class SimpleHttpServer
   #
   # @return [ String ]
   def create_response(code, header, body)
-    header[Shelf::DATE] ||= http_date
+    header[:Date] ||= http_date
+    header[:Connection] = :close
 
     header_ary = []
     header.each { |k, v| header_ary << ["#{k}:#{v}"] if v }
