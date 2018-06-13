@@ -61,6 +61,7 @@ class SimpleHttpServer
         raise 'Connection reset by peer' if config[:debug] && io.closed?
       ensure
         io.close rescue nil
+        io = data = res = nil
       end
     end
   end
@@ -73,7 +74,9 @@ class SimpleHttpServer
   #
   # @return [ BasicSocket ]
   def accept_connection(tcp)
-    BasicSocket.for_fd(tcp.sysaccept)
+    sock = BasicSocket.for_fd(tcp.sysaccept)
+  ensure
+    sock.setsockopt(Socket::SOL_SOCKET, Socket::SO_NOSIGPIPE, true)
   end
 
   # Receive data from the socket in a loop until all data have been received.
