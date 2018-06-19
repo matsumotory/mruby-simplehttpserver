@@ -56,12 +56,12 @@ class SimpleHttpServer
       begin
         data = receive_data(io)
         res  = on_data(io, data) if data
-        io.send(res, 0)          if res
+        io.syswrite(res)         if res
       rescue
         raise 'Connection reset by peer' if config[:debug] && io.closed?
       ensure
         io.close rescue nil
-        io = data = res = nil
+        GC.start if config[:run_gc_per_request]
       end
     end
   end
