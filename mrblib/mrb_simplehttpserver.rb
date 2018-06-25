@@ -74,9 +74,13 @@ class SimpleHttpServer
   #
   # @return [ BasicSocket ]
   def accept_connection(tcp)
+    counter = counter ? counter + 1 : 1
+
     sock = BasicSocket.for_fd(tcp.sysaccept)
     sock.setsockopt(Socket::SOL_SOCKET, Socket::SO_NOSIGPIPE, true) if Socket.const_defined? :SO_NOSIGPIPE
     sock
+  rescue RuntimeError
+    retry if counter == 1
   end
 
   # Receive data from the socket in a loop until all data have been received.
@@ -86,12 +90,22 @@ class SimpleHttpServer
   #
   # @return [ String ] nil if no data could be read.
   def receive_data(io)
-    data = ''
+    data = nil
     time = Time.now if @nonblock
+    ext  = String.method_defined? :<<
 
     loop do
       begin
-        data << buf = io.recv(RECV_BUF, @nonblock ? Socket::MSG_DONTWAIT : 0)
+        buf = io.recv(RECV_BUF, @nonblock ? Socket::MSG_DONTWAIT : 0)
+
+        if !data
+          data = buf
+        elsif ext
+          data << buf
+        else
+          data += buf
+        end
+
         return data if buf.size != RECV_BUF
       rescue
         next if (Time.now - time) < @timeout
