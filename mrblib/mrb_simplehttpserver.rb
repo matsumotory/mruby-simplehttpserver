@@ -90,12 +90,22 @@ class SimpleHttpServer
   #
   # @return [ String ] nil if no data could be read.
   def receive_data(io)
-    data = ''
+    data = nil
     time = Time.now if @nonblock
+    ext  = String.method_defined? :<<
 
     loop do
       begin
-        data << buf = io.recv(RECV_BUF, @nonblock ? Socket::MSG_DONTWAIT : 0)
+        buf = io.recv(RECV_BUF, @nonblock ? Socket::MSG_DONTWAIT : 0)
+
+        if !data
+          data = buf
+        elsif ext
+          data << buf
+        else
+          data += buf
+        end
+
         return data if buf.size != RECV_BUF
       rescue
         next if (Time.now - time) < @timeout
