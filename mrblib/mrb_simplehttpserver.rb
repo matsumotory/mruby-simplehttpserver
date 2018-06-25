@@ -74,9 +74,13 @@ class SimpleHttpServer
   #
   # @return [ BasicSocket ]
   def accept_connection(tcp)
+    counter = counter ? counter + 1 : 1
+
     sock = BasicSocket.for_fd(tcp.sysaccept)
     sock.setsockopt(Socket::SOL_SOCKET, Socket::SO_NOSIGPIPE, true) if Socket.const_defined? :SO_NOSIGPIPE
     sock
+  rescue RuntimeError
+    retry if counter == 1
   end
 
   # Receive data from the socket in a loop until all data have been received.
