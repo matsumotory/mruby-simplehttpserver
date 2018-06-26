@@ -55,8 +55,7 @@ class SimpleHttpServer
 
       begin
         data = receive_data(io)
-        res  = on_data(io, data) if data
-        io.syswrite(res)         if res
+        send_data(io, handle_data(io, data)) if data
       rescue
         raise 'Connection reset by peer' if config[:debug] && io.closed?
       ensure
@@ -78,7 +77,6 @@ class SimpleHttpServer
 
     sock = BasicSocket.for_fd(tcp.sysaccept)
     sock.setsockopt(Socket::SOL_SOCKET, Socket::SO_NOSIGPIPE, true) if Socket.const_defined? :SO_NOSIGPIPE
-    sock.setsockopt(Socket::SOL_SOCKET, Socket::MSG_NOSIGNAL, true) if Socket.const_defined? :MSG_NOSIGNAL
     sock
   rescue RuntimeError => e
     counter == 1 ? retry : raise(e)
@@ -121,12 +119,26 @@ class SimpleHttpServer
   # @param [ String ]      data The data reveiced from the socket.
   #
   # @return [ String ]
-  def on_data(io, data)
+  def handle_data(io, data)
     request              = @parser.parse_request(data)
     env                  = request_to_env(io, request)
     status, header, body = @app.call(env)
 
     create_response(status, header, body.join)
+  end
+
+  # Send data back to the client.
+  #
+  # @param [ BasicSocket ] io   The tcp socket where to send the data.
+  # @param [ String ]      data The data to send.
+  #
+  # @return [ String ]
+  def send_data(io, data)
+    loop do
+      n = io.syswrite(data)
+      return if n == data.bytesize
+      data = data[n..-1]
+    end
   end
 
   # Convert the parsed HTTP request into an environemt hash
