@@ -78,6 +78,7 @@ class SimpleHttpServer
 
     sock = BasicSocket.for_fd(tcp.sysaccept)
     sock.setsockopt(Socket::SOL_SOCKET, Socket::SO_NOSIGPIPE, true) if Socket.const_defined? :SO_NOSIGPIPE
+    sock.setsockopt(Socket::SOL_SOCKET, Socket::MSG_NOSIGNAL, true) if Socket.const_defined? :MSG_NOSIGNAL
     sock
   rescue RuntimeError => e
     counter == 1 ? retry : raise(e)
