@@ -68,7 +68,6 @@ assert 'SimpleHttpServer#run' do
 
     res = `curl -si localhost:8000/mruby`
     h.parse_response(res) {|x|
-      assert_equal 'GET', x.method
       assert_equal 'mruby-simplehttpserver', x.headers['Server']
       assert_nil x.headers['Content-type']
       assert_equal "Hello mruby World.\n", x.body
