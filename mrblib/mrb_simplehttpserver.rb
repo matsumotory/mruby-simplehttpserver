@@ -36,22 +36,27 @@ class SimpleHttpServer
     @config   = config
     @host     = config[:host] || config[:server_ip]
     @port     = config[:port]
+    @path     = config[:path]
     @nonblock = config[:nonblock] != false
     @timeout  = [0, config[:timeout] || 5].max
     @app      = config[:app]
     @parser   = HTTP::Parser.new
   end
 
-  attr_reader :config, :host, :port
+  attr_reader :config, :host, :port, :path
 
   # Bind to the host and port and wait for incomming connections.
   #
   # @return [ Void ]
   def run
-    tcp = TCPServer.new(host, port)
+    srv = if self.path
+            UNIXServer.new(path)
+          else
+            TCPServer.new(host, port)
+          end
 
     loop do
-      io = accept_connection(tcp)
+      io = accept_connection(srv)
 
       begin
         data = receive_data(io)

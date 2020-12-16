@@ -27,4 +27,5 @@ MRuby::Build.new do |conf|
   conf.enable_test
 
   conf.gem __dir__
+  conf.gembox :default
 end
