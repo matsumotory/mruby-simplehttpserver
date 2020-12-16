@@ -21,7 +21,7 @@
 # SOFTWARE.
 
 ENV['MRUBY_CONFIG']  ||= File.expand_path('build_config.rb')
-ENV['MRUBY_VERSION'] ||= 'head'
+ENV['MRUBY_VERSION'] ||= '2.1.2'
 
 file :mruby do
   if ENV['MRUBY_VERSION'] == 'head'
