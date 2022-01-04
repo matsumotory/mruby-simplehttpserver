@@ -18,6 +18,8 @@ app = Proc.new do |env|
   when '/html'
     headers['Content-type'] = 'text/html; charset=utf-8'
     body = '<H1>Hello mruby World.</H1>'
+  when '/echo'
+    body = env['shelf.input'].read
   when '/notfound'
     # Custom error response message
     body = "Not Found on this server: #{path}"
@@ -77,6 +79,11 @@ assert 'SimpleHttpServer#run' do
     h.parse_response(res) {|x|
       assert_equal 'text/html; charset=utf-8', x.headers['Content-type']
       assert_equal "<H1>Hello mruby World.</H1>", x.body
+    }
+
+    res = `curl -si localhost:8000/echo -d 'This is body'`
+    h.parse_response(res) {|x|
+      assert_equal "This is body", x.body
     }
 
     res = `curl -si localhost:8000/notfound`
