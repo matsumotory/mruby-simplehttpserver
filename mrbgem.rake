@@ -30,6 +30,7 @@ MRuby::Gem::Specification.new('mruby-simplehttpserver') do |spec|
   spec.add_dependency('mruby-time', core: 'mruby-time')
   spec.add_dependency('mruby-http')
   spec.add_dependency('mruby-shelf')
+  spec.add_dependency('mruby-stringio')
 
   if MRuby::Source::MRUBY_VERSION >= '1.4.0'
     spec.add_dependency('mruby-io', core: 'mruby-io')

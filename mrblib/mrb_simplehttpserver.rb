@@ -126,7 +126,7 @@ class SimpleHttpServer
   # @return [ String ]
   def handle_data(io, data)
     request              = @parser.parse_request(data)
-    env                  = request_to_env(io, request)
+    env                  = request_to_env(request)
     status, header, body = @app.call(env)
 
     create_response(status, header, body.join)
@@ -149,11 +149,14 @@ class SimpleHttpServer
   # Convert the parsed HTTP request into an environemt hash
   # to be passed to the shelf app.
   #
-  # @param [ BasicSocket ]   io  The tcp socket from where to read the data.
   # @param [ HTTP::Request ] req The parsed HTTP request object.
   #
   # @return [ Hash<String, Object> ]
-  def request_to_env(io, req)
+  def request_to_env(req)
+    string_io = StringIO.new
+    string_io.write req.body
+    string_io.rewind
+
     req.headers.merge(
       Shelf::REQUEST_METHOD   => req.method,
       Shelf::PATH_INFO        => req.path || ROOT_PATH,
@@ -163,7 +166,7 @@ class SimpleHttpServer
       Shelf::SERVER_ADDR      => host,
       Shelf::SERVER_PORT      => port,
       Shelf::SHELF_URL_SCHEME => req.schema,
-      Shelf::SHELF_INPUT      => io
+      Shelf::SHELF_INPUT      => string_io
     )
   end
 
